@@ -108,6 +108,7 @@ public class ReservationController {
                 reservation.getStatus().name(),
                 reservation.getUser().getEmail(),
                 reservation.getPlan().getCourse().getTitle(),
+                reservation.getPlan().getPrice(),
                 reservation.getCreatedAt(),
                 paid
         );

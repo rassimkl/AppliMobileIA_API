@@ -3,8 +3,10 @@ package com.inspireacademy.backend.service;
 import com.inspireacademy.backend.dto.CourseResponse;
 import com.inspireacademy.backend.dto.CreateCourseRequest;
 import com.inspireacademy.backend.model.Course;
+import com.inspireacademy.backend.model.Langue;
 import com.inspireacademy.backend.model.User;
 import com.inspireacademy.backend.repository.CourseRepository;
+import com.inspireacademy.backend.repository.LangueRepository;
 import com.inspireacademy.backend.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
@@ -17,11 +19,16 @@ public class CourseService {
 
     private final CourseRepository courseRepository;
     private final UserRepository userRepository;
+    private final LangueRepository langueRepository;
 
-    public CourseService(CourseRepository courseRepository,
-                         UserRepository userRepository) {
+    public CourseService(
+            CourseRepository courseRepository,
+            UserRepository userRepository,
+            LangueRepository langueRepository
+    ) {
         this.courseRepository = courseRepository;
         this.userRepository = userRepository;
+        this.langueRepository = langueRepository;
     }
 
     // 🔥 CREATE COURSE
@@ -31,11 +38,14 @@ public class CourseService {
         User admin = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Utilisateur introuvable"));
 
-        Course course = new Course();
+        // 🔎 récupérer la langue depuis DB (FK)
+        Langue langue = langueRepository.findById(request.getLangueId())
+                .orElseThrow(() -> new RuntimeException("Langue introuvable"));
 
+        Course course = new Course();
         course.setTitle(request.getTitle());
         course.setDescription(request.getDescription());
-        course.setLanguage(request.getLanguage());
+        course.setLangue(langue);
         course.setLevel(request.getLevel());
         course.setStatus("PUBLISHED");
         course.setCreatedBy(admin.getId());
@@ -62,18 +72,17 @@ public class CourseService {
         return mapToResponse(course);
     }
 
-    public CourseResponse updateCourse(
-            Long id,
-            CreateCourseRequest request,
-            String email
-    ) {
+    public CourseResponse updateCourse(Long id, CreateCourseRequest request, String email) {
 
         Course course = courseRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Cours non trouvé"));
 
+        Langue langue = langueRepository.findById(request.getLangueId())
+                .orElseThrow(() -> new RuntimeException("Langue introuvable"));
+
         course.setTitle(request.getTitle());
         course.setDescription(request.getDescription());
-        course.setLanguage(request.getLanguage());
+        course.setLangue(langue);
         course.setLevel(request.getLevel());
         course.setUpdatedAt(LocalDateTime.now());
 
@@ -87,7 +96,6 @@ public class CourseService {
         if (!courseRepository.existsById(id)) {
             throw new RuntimeException("Cours introuvable");
         }
-
         courseRepository.deleteById(id);
     }
 
@@ -97,7 +105,8 @@ public class CourseService {
                 course.getId(),
                 course.getTitle(),
                 course.getDescription(),
-                course.getLanguage(),
+                course.getLangue().getId(),
+                course.getLangue().getName(),
                 course.getLevel(),
                 course.getStatus(),
                 course.getCreatedAt()

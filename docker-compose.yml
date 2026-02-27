@@ -23,7 +23,7 @@ services:
       SPRING_DATASOURCE_USERNAME: appuser
       SPRING_DATASOURCE_PASSWORD: secret
     ports:
-      - "8081:8080"
+      - "9090:8080"
     depends_on:
       - db
 

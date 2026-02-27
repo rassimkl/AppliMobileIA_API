@@ -2,6 +2,8 @@ package com.inspireacademy.backend.model;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "users")
@@ -26,6 +28,14 @@ public class User {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Role role;
+
+    @ManyToMany
+    @JoinTable(
+            name = "user_langues",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "langue_id")
+    )
+    private Set<Langue> languages = new HashSet<>();
 
     private boolean enabled;
 
@@ -83,6 +93,10 @@ public class User {
     public void setRole(Role role) {
         this.role = role;
     }
+
+    public Set<Langue> getLanguages() { return languages; }
+
+    public void setLanguages(Set<Langue> languages) { this.languages = languages; }
 
     public boolean getEnabled() {
         return enabled;

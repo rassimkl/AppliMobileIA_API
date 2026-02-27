@@ -8,6 +8,7 @@ public class ReservationResponse {
     private String status;
     private String userEmail;
     private String courseTitle;
+    private Double planPrice;
     private LocalDateTime createdAt;
     private boolean paid;
 
@@ -16,6 +17,7 @@ public class ReservationResponse {
             String status,
             String userEmail,
             String courseTitle,
+            Double planPrice,
             LocalDateTime createdAt,
             boolean paid
     ) {
@@ -23,6 +25,7 @@ public class ReservationResponse {
         this.status = status;
         this.userEmail = userEmail;
         this.courseTitle = courseTitle;
+        this.planPrice = planPrice;
         this.createdAt = createdAt;
         this.paid = paid;
     }
@@ -31,6 +34,7 @@ public class ReservationResponse {
     public String getStatus() { return status; }
     public String getUserEmail() { return userEmail; }
     public String getCourseTitle() { return courseTitle; }
+    public Double getPlanPrice() { return planPrice; }
     public LocalDateTime getCreatedAt() { return createdAt; }
     public boolean isPaid() { return paid; }
 }

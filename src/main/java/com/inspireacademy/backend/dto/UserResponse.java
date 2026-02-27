@@ -1,6 +1,7 @@
 package com.inspireacademy.backend.dto;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 
 public class UserResponse {
 
@@ -9,6 +10,7 @@ public class UserResponse {
     private String firstName;
     private String lastName;
     private String role;
+    private Set<String> languages;
     private boolean enabled;
     private LocalDateTime createdAt;
 
@@ -18,6 +20,7 @@ public class UserResponse {
             String firstName,
             String lastName,
             String role,
+            Set<String> languages,
             boolean enabled,
             LocalDateTime createdAt
     ) {
@@ -26,38 +29,17 @@ public class UserResponse {
         this.firstName = firstName;
         this.lastName = lastName;
         this.role = role;
+        this.languages = languages;
         this.enabled = enabled;
         this.createdAt = createdAt;
     }
 
-    // getters uniquement (pas de setters)
-
-    public Long getId() {
-        return id;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public String getRole() {
-        return role;
-    }
-
-    public boolean isEnabled() {
-        return enabled;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
+    public Long getId() { return id; }
+    public String getEmail() { return email; }
+    public String getFirstName() { return firstName; }
+    public String getLastName() { return lastName; }
+    public String getRole() { return role; }
+    public Set<String> getLanguages() { return languages; }
+    public boolean isEnabled() { return enabled; }
+    public LocalDateTime getCreatedAt() { return createdAt; }
 }

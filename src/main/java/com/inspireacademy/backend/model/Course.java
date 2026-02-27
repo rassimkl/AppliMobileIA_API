@@ -17,8 +17,10 @@ public class Course {
     @Column(columnDefinition = "TEXT")
     private String description;
 
-    @Column(nullable = false)
-    private String language;
+    // ✅ Remplace String language par une FK vers la table langue
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "langue_id", nullable = false)
+    private Langue langue;
 
     private String level;
 
@@ -39,7 +41,9 @@ public class Course {
         this.updatedAt = LocalDateTime.now();
     }
 
+    // =========================
     // GETTERS & SETTERS
+    // =========================
     public Long getId() {
         return id;
     }
@@ -64,12 +68,12 @@ public class Course {
         this.description = description;
     }
 
-    public String getLanguage() {
-        return language;
+    public Langue getLangue() {
+        return langue;
     }
 
-    public void setLanguage(String language) {
-        this.language = language;
+    public void setLangue(Langue langue) {
+        this.langue = langue;
     }
 
     public String getLevel() {
@@ -111,5 +115,4 @@ public class Course {
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
     }
-
 }

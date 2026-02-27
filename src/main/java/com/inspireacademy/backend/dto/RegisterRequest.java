@@ -18,6 +18,8 @@ public class RegisterRequest {
     @NotBlank
     private String lastName;
 
+    private String role;
+
     // ✅ GETTERS
     public String getEmail() {
         return email;
@@ -34,6 +36,8 @@ public class RegisterRequest {
     public String getLastName() {
         return lastName;
     }
+
+    public String getRole() {return role;}
 
     // (setters optionnels mais recommandés)
     public void setEmail(String email) {

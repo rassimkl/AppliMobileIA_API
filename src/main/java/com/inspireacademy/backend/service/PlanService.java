@@ -138,7 +138,7 @@ public class PlanService {
 
         response.setId(plan.getId());
         response.setCourseTitle(plan.getCourse().getTitle());
-        response.setLanguage(plan.getCourse().getLanguage());
+        response.setLanguage(plan.getCourse().getLangue().getName());
         response.setLevel(plan.getCourse().getLevel());
         response.setNumberOfHours(plan.getNumberOfHours());
         response.setType(plan.getType());
