@@ -42,6 +42,13 @@ public class User {
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
+    @ManyToOne
+    @JoinColumn(name = "teacher_id")
+    private User teacher;
+
+    @OneToMany(mappedBy = "teacher")
+    private Set<User> students = new HashSet<>();
+
     @PrePersist
     public void prePersist() {
         this.createdAt = LocalDateTime.now();
