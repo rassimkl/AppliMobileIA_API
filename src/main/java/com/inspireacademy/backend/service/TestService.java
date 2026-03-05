@@ -203,6 +203,7 @@ public class TestService {
                             .completed(a.isCompleted())
                             .score(lastResult != null ? lastResult.getScore() : null)
                             .maxScore(lastResult != null ? lastResult.getMaxScore() : null)
+                            .resultId(lastResult != null ? lastResult.getId() : null)
                             .build();
                 })
                 .toList();
@@ -403,6 +404,8 @@ public class TestService {
                         .resultId(r.getId())
                         .studentId(r.getStudent().getId())
                         .studentEmail(r.getStudent().getEmail())
+                        .studentFirstName(r.getStudent().getFirstName())
+                        .studentLastName(r.getStudent().getLastName())
                         .score(r.getScore())
                         .maxScore(r.getMaxScore())
                         .completedAt(r.getCompletedAt())
@@ -460,4 +463,83 @@ public class TestService {
                 .points(q.getPoints())
                 .build();
     }
+
+
+    public AdminTestResultDetailsResponse getAdminResultDetails(Long resultId) {
+
+        TestResult result = resultRepository.findById(resultId)
+                .orElseThrow(() -> new RuntimeException("Result not found"));
+
+        AdminTestResultDetailsResponse dto = new AdminTestResultDetailsResponse();
+        dto.setResultId(result.getId());
+        dto.setStudentEmail(result.getStudent().getEmail());
+        dto.setStudentFirstName(result.getStudent().getFirstName());
+        dto.setStudentLastName(result.getStudent().getLastName());
+        dto.setScore(result.getScore());
+        dto.setMaxScore(result.getMaxScore());
+        dto.setCompletedAt(result.getCompletedAt());
+
+        List<AdminAnswerDetailsResponse> answers = result.getAnswers()
+                .stream()
+                .map(answer -> {
+
+                    AdminAnswerDetailsResponse a = new AdminAnswerDetailsResponse();
+
+                    Question q = answer.getQuestion();
+
+                    a.setQuestionId(q.getId());
+                    a.setQuestionContent(q.getContent());
+                    a.setQuestionType(q.getType().name());
+                    a.setQuestionPoints(q.getPoints());
+
+                    if (q.getType() == QuestionType.QCM) {
+
+                        a.setStudentAnswer(
+                                answer.getSelectedOption() != null
+                                        ? answer.getSelectedOption().getContent()
+                                        : null
+                        );
+
+                        String correct = q.getOptions()
+                                .stream()
+                                .filter(Option::isCorrect)
+                                .findFirst()
+                                .map(Option::getContent)
+                                .orElse(null);
+
+                        a.setCorrectAnswer(correct);
+                    }
+
+                    if (q.getType() == QuestionType.TEXT) {
+
+                        a.setStudentAnswer(answer.getTextAnswer());
+                        a.setCorrectAnswer(q.getExpectedAnswer());
+                    }
+
+                    a.setAwardedPoints(answer.getAwardedPoints());
+
+                    return a;
+                })
+                .toList();
+
+        dto.setAnswers(answers);
+
+        return dto;
+    }
+
+
+    public AdminTestResultDetailsResponse getStudentResultDetails(
+            Long resultId,
+            User student) {
+
+        TestResult result = resultRepository.findById(resultId)
+                .orElseThrow(() -> new RuntimeException("Result not found"));
+
+        if (!result.getStudent().getId().equals(student.getId())) {
+            throw new RuntimeException("Access denied");
+        }
+
+        return getAdminResultDetails(resultId);
+    }
+
 }

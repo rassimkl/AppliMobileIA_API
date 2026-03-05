@@ -14,4 +14,6 @@ public class TestAssignmentResponse {
 
     private Integer score;
     private Integer maxScore;
+
+    private Long resultId;
 }

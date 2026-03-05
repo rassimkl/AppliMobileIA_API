@@ -103,6 +103,25 @@ public class TestController {
         return testService.getResultsByTest(testId);
     }
 
+    @GetMapping("/results/{resultId}")
+    @PreAuthorize("hasAnyRole('ADMIN','ENSEIGNANT')")
+    public AdminTestResultDetailsResponse getResultDetails(
+            @PathVariable Long resultId) {
+
+        return testService.getAdminResultDetails(resultId);
+    }
+
+    @GetMapping("/my-results/{resultId}")
+    @PreAuthorize("hasRole('ETUDIANT')")
+    public AdminTestResultDetailsResponse getMyResultDetails(
+            @PathVariable Long resultId,
+            Authentication authentication) {
+
+        User student = getConnectedUser(authentication);
+
+        return testService.getStudentResultDetails(resultId, student);
+    }
+
     // 8) GET TEST DETAILS (ADMIN) -> DTO
     @GetMapping("/{testId}/admin-details")
     @PreAuthorize("hasRole('ADMIN')")
@@ -135,4 +154,6 @@ public class TestController {
                                                 @RequestBody CreateQuestionRequest request) {
         return testService.updateQuestion(questionId, request);
     }
+
+
 }

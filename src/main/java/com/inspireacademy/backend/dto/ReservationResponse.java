@@ -7,6 +7,8 @@ public class ReservationResponse {
     private Long id;
     private String status;
     private String userEmail;
+    private String userFirstName;
+    private String userLastName;
     private String courseTitle;
     private Double planPrice;
     private LocalDateTime createdAt;
@@ -16,6 +18,8 @@ public class ReservationResponse {
             Long id,
             String status,
             String userEmail,
+            String userFirstName,
+            String userLastName,
             String courseTitle,
             Double planPrice,
             LocalDateTime createdAt,
@@ -24,6 +28,8 @@ public class ReservationResponse {
         this.id = id;
         this.status = status;
         this.userEmail = userEmail;
+        this.userFirstName = userFirstName;
+        this.userLastName = userLastName;
         this.courseTitle = courseTitle;
         this.planPrice = planPrice;
         this.createdAt = createdAt;
@@ -33,6 +39,8 @@ public class ReservationResponse {
     public Long getId() { return id; }
     public String getStatus() { return status; }
     public String getUserEmail() { return userEmail; }
+    public String getUserFirstName() { return userFirstName; }
+    public String getUserLastName() { return userLastName; }
     public String getCourseTitle() { return courseTitle; }
     public Double getPlanPrice() { return planPrice; }
     public LocalDateTime getCreatedAt() { return createdAt; }
