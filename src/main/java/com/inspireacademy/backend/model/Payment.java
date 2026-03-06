@@ -1,8 +1,13 @@
 package com.inspireacademy.backend.model;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+
 import java.time.LocalDateTime;
 
+@Getter
+@Setter
 @Entity
 public class Payment {
 
@@ -21,53 +26,21 @@ public class Payment {
     private String status; // PAID, FAILED
 
     @Column(nullable = false)
+    private String provider; // STRIPE
+
+    @Column(unique = true)
+    private String checkoutSessionId;
+
+    @Column(unique = true)
+    private String paymentIntentId;
+
+    @Column(nullable = false)
+    private String currency; // "eur"
+
+    @Column(unique = true)
+    private String stripeEventId;
+
+    @Column(nullable = false)
     private LocalDateTime createdAt;
 
-    // =========================
-    // GETTERS
-    // =========================
-
-    public Long getId() {
-        return id;
-    }
-
-    public Reservation getReservation() {
-        return reservation;
-    }
-
-    public Double getAmount() {
-        return amount;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    // =========================
-    // SETTERS
-    // =========================
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public void setReservation(Reservation reservation) {
-        this.reservation = reservation;
-    }
-
-    public void setAmount(Double amount) {
-        this.amount = amount;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
 }
