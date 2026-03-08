@@ -30,6 +30,7 @@ public class AdminTestDetailsMapper {
                     .content(q.getContent())
                     .type(q.getType().name())
                     .points(q.getPoints())
+                    .expectedAnswer(q.getExpectedAnswer())
                     .options(options)
                     .build();
         }).toList();

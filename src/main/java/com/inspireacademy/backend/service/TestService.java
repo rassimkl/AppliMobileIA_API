@@ -487,6 +487,21 @@ public class TestService {
 
                     Question q = answer.getQuestion();
 
+                    List<AdminOptionResponse> options = null;
+
+                    if (q.getType() == QuestionType.QCM) {
+
+                        options = q.getOptions()
+                                .stream()
+                                .map(o -> new AdminOptionResponse(
+                                        o.getId(),
+                                        o.getContent(),
+                                        o.isCorrect()
+                                ))
+                                .toList();
+
+                    }
+
                     a.setQuestionId(q.getId());
                     a.setQuestionContent(q.getContent());
                     a.setQuestionType(q.getType().name());
@@ -517,6 +532,7 @@ public class TestService {
                     }
 
                     a.setAwardedPoints(answer.getAwardedPoints());
+                    a.setOptions(options);
 
                     return a;
                 })
