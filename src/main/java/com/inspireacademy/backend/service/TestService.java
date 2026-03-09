@@ -11,6 +11,7 @@ import com.inspireacademy.backend.service.mapper.TestMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.inspireacademy.backend.repository.UserRepository;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -27,6 +28,7 @@ public class TestService {
     private final TestResultRepository resultRepository;
     private final AnswerRepository answerRepository;
     private final LangueRepository langueRepository;
+    private final UserRepository userRepository;
 
     // =====================================================
     // 1) CREATE TEST (ADMIN) -> DTO
@@ -552,6 +554,49 @@ public class TestService {
                 .orElseThrow(() -> new RuntimeException("Result not found"));
 
         if (!result.getStudent().getId().equals(student.getId())) {
+            throw new RuntimeException("Access denied");
+        }
+
+        return getAdminResultDetails(resultId);
+    }
+
+    public List<AdminTestResultResponse> getTeacherStudentsResults(String email) {
+
+        User teacher = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Teacher not found"));
+
+        List<TestResult> results =
+                resultRepository.findByStudent_Teacher_Id(teacher.getId());
+
+        return results.stream().map(result -> {
+
+            AdminTestResultResponse dto = new AdminTestResultResponse();
+
+            dto.setResultId(result.getId());
+            dto.setStudentFirstName(result.getStudent().getFirstName());
+            dto.setStudentLastName(result.getStudent().getLastName());
+            dto.setScore(result.getScore());
+            dto.setMaxScore(result.getMaxScore());
+            dto.setCompletedAt(result.getCompletedAt());
+
+            return dto;
+
+        }).toList();
+    }
+
+
+    public AdminTestResultDetailsResponse getTeacherResultDetails(
+            Long resultId,
+            String teacherEmail
+    ) {
+
+        TestResult result = resultRepository.findById(resultId)
+                .orElseThrow(() -> new RuntimeException("Result not found"));
+
+        User teacher = userRepository.findByEmail(teacherEmail)
+                .orElseThrow(() -> new RuntimeException("Teacher not found"));
+
+        if (!result.getStudent().getTeacher().getId().equals(teacher.getId())) {
             throw new RuntimeException("Access denied");
         }
 

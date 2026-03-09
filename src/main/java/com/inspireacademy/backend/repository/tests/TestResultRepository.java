@@ -14,4 +14,6 @@ public interface TestResultRepository extends JpaRepository<TestResult, Long> {
 
     Optional<TestResult> findTopByTestIdAndStudentIdOrderByCompletedAtDesc(Long testId, Long studentId);
 
+    List<TestResult> findByStudent_Teacher_Id(Long teacherId);
+
 }

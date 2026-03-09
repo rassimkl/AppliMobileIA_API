@@ -113,6 +113,38 @@ public class UserService {
         userRepository.deleteById(id);
     }
 
+    public void assignStudentToTeacher(Long studentId, Long teacherId) {
+
+        User student = userRepository.findById(studentId)
+                .orElseThrow(() -> new RuntimeException("Étudiant introuvable"));
+
+        User teacher = userRepository.findById(teacherId)
+                .orElseThrow(() -> new RuntimeException("Enseignant introuvable"));
+
+        if (student.getRole() != Role.ETUDIANT) {
+            throw new RuntimeException("L'utilisateur n'est pas un étudiant");
+        }
+
+        if (teacher.getRole() != Role.ENSEIGNANT) {
+            throw new RuntimeException("L'utilisateur n'est pas un enseignant");
+        }
+
+        student.setTeacher(teacher);
+
+        userRepository.save(student);
+    }
+
+    public List<UserResponse> getStudentsForTeacher(String email) {
+
+        User teacher = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Teacher not found"));
+
+        return teacher.getStudents()
+                .stream()
+                .map(this::mapToResponse)
+                .toList();
+    }
+
     private UserResponse mapToResponse(User user) {
 
         Set<String> languageNames = user.getLanguages()

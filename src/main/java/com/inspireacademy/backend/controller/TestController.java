@@ -5,6 +5,7 @@ import com.inspireacademy.backend.model.User;
 import com.inspireacademy.backend.repository.UserRepository;
 import com.inspireacademy.backend.service.TestService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -155,5 +156,34 @@ public class TestController {
         return testService.updateQuestion(questionId, request);
     }
 
+
+    @PreAuthorize("hasRole('ENSEIGNANT')")
+    @GetMapping("/teacher/results")
+    public ResponseEntity<List<AdminTestResultResponse>> getTeacherResults(
+            Authentication authentication
+    ) {
+
+        String email = authentication.getName();
+
+        return ResponseEntity.ok(
+                testService.getTeacherStudentsResults(email)
+        );
+    }
+
+
+    @PreAuthorize("hasRole('ENSEIGNANT')")
+    @GetMapping("/teacher/results/{resultId}")
+    public ResponseEntity<AdminTestResultDetailsResponse>
+    getTeacherResultDetails(
+            @PathVariable Long resultId,
+            Authentication authentication
+    ) {
+
+        String email = authentication.getName();
+
+        return ResponseEntity.ok(
+                testService.getTeacherResultDetails(resultId, email)
+        );
+    }
 
 }
