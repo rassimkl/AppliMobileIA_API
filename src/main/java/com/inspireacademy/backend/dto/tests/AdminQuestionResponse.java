@@ -14,5 +14,7 @@ public class AdminQuestionResponse {
     private String content;
     private String type;
     private Integer points;
+
+    private String expectedAnswer;
     private List<AdminOptionResponse> options;
 }

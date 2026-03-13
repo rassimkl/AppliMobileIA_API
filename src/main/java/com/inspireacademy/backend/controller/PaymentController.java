@@ -4,6 +4,8 @@ import com.inspireacademy.backend.model.Payment;
 import com.inspireacademy.backend.service.PaymentService;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/api/payments")
 @CrossOrigin
@@ -15,8 +17,9 @@ public class PaymentController {
         this.paymentService = paymentService;
     }
 
-    @PostMapping("/{reservationId}")
-    public Payment payReservation(@PathVariable Long reservationId) {
-        return paymentService.processPayment(reservationId);
+    @PostMapping("/{reservationId}/checkout-session")
+    public Map<String, String> createCheckoutSession(@PathVariable Long reservationId) throws Exception{
+        String url = paymentService.createStripeCheckoutSession(reservationId);
+        return Map.of("url", url);
     }
 }

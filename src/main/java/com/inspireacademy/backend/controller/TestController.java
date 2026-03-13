@@ -5,6 +5,7 @@ import com.inspireacademy.backend.model.User;
 import com.inspireacademy.backend.repository.UserRepository;
 import com.inspireacademy.backend.service.TestService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -103,6 +104,25 @@ public class TestController {
         return testService.getResultsByTest(testId);
     }
 
+    @GetMapping("/results/{resultId}")
+    @PreAuthorize("hasAnyRole('ADMIN','ENSEIGNANT')")
+    public AdminTestResultDetailsResponse getResultDetails(
+            @PathVariable Long resultId) {
+
+        return testService.getAdminResultDetails(resultId);
+    }
+
+    @GetMapping("/my-results/{resultId}")
+    @PreAuthorize("hasRole('ETUDIANT')")
+    public AdminTestResultDetailsResponse getMyResultDetails(
+            @PathVariable Long resultId,
+            Authentication authentication) {
+
+        User student = getConnectedUser(authentication);
+
+        return testService.getStudentResultDetails(resultId, student);
+    }
+
     // 8) GET TEST DETAILS (ADMIN) -> DTO
     @GetMapping("/{testId}/admin-details")
     @PreAuthorize("hasRole('ADMIN')")
@@ -135,4 +155,35 @@ public class TestController {
                                                 @RequestBody CreateQuestionRequest request) {
         return testService.updateQuestion(questionId, request);
     }
+
+
+    @PreAuthorize("hasRole('ENSEIGNANT')")
+    @GetMapping("/teacher/results")
+    public ResponseEntity<List<AdminTestResultResponse>> getTeacherResults(
+            Authentication authentication
+    ) {
+
+        String email = authentication.getName();
+
+        return ResponseEntity.ok(
+                testService.getTeacherStudentsResults(email)
+        );
+    }
+
+
+    @PreAuthorize("hasRole('ENSEIGNANT')")
+    @GetMapping("/teacher/results/{resultId}")
+    public ResponseEntity<AdminTestResultDetailsResponse>
+    getTeacherResultDetails(
+            @PathVariable Long resultId,
+            Authentication authentication
+    ) {
+
+        String email = authentication.getName();
+
+        return ResponseEntity.ok(
+                testService.getTeacherResultDetails(resultId, email)
+        );
+    }
+
 }

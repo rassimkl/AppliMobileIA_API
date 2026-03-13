@@ -107,6 +107,8 @@ public class ReservationController {
                 reservation.getId(),
                 reservation.getStatus().name(),
                 reservation.getUser().getEmail(),
+                reservation.getUser().getFirstName(),
+                reservation.getUser().getLastName(),
                 reservation.getPlan().getCourse().getTitle(),
                 reservation.getPlan().getPrice(),
                 reservation.getCreatedAt(),

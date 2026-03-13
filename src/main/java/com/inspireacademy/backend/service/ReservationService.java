@@ -8,6 +8,7 @@ import com.inspireacademy.backend.repository.PlanRepository;
 import com.inspireacademy.backend.repository.ReservationRepository;
 import com.inspireacademy.backend.repository.UserRepository;
 import org.springframework.stereotype.Service;
+import com.inspireacademy.backend.dto.ReservationResponse;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -92,6 +93,7 @@ public class ReservationService {
     // GET ALL
     // ==========================
     public List<Reservation> getAllReservations() {
+
         return reservationRepository.findAll();
     }
 }

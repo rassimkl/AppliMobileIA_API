@@ -11,6 +11,7 @@ import com.inspireacademy.backend.service.mapper.TestMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.inspireacademy.backend.repository.UserRepository;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -27,6 +28,7 @@ public class TestService {
     private final TestResultRepository resultRepository;
     private final AnswerRepository answerRepository;
     private final LangueRepository langueRepository;
+    private final UserRepository userRepository;
 
     // =====================================================
     // 1) CREATE TEST (ADMIN) -> DTO
@@ -203,6 +205,7 @@ public class TestService {
                             .completed(a.isCompleted())
                             .score(lastResult != null ? lastResult.getScore() : null)
                             .maxScore(lastResult != null ? lastResult.getMaxScore() : null)
+                            .resultId(lastResult != null ? lastResult.getId() : null)
                             .build();
                 })
                 .toList();
@@ -403,6 +406,8 @@ public class TestService {
                         .resultId(r.getId())
                         .studentId(r.getStudent().getId())
                         .studentEmail(r.getStudent().getEmail())
+                        .studentFirstName(r.getStudent().getFirstName())
+                        .studentLastName(r.getStudent().getLastName())
                         .score(r.getScore())
                         .maxScore(r.getMaxScore())
                         .completedAt(r.getCompletedAt())
@@ -460,4 +465,142 @@ public class TestService {
                 .points(q.getPoints())
                 .build();
     }
+
+
+    public AdminTestResultDetailsResponse getAdminResultDetails(Long resultId) {
+
+        TestResult result = resultRepository.findById(resultId)
+                .orElseThrow(() -> new RuntimeException("Result not found"));
+
+        AdminTestResultDetailsResponse dto = new AdminTestResultDetailsResponse();
+        dto.setResultId(result.getId());
+        dto.setStudentEmail(result.getStudent().getEmail());
+        dto.setStudentFirstName(result.getStudent().getFirstName());
+        dto.setStudentLastName(result.getStudent().getLastName());
+        dto.setScore(result.getScore());
+        dto.setMaxScore(result.getMaxScore());
+        dto.setCompletedAt(result.getCompletedAt());
+
+        List<AdminAnswerDetailsResponse> answers = result.getAnswers()
+                .stream()
+                .map(answer -> {
+
+                    AdminAnswerDetailsResponse a = new AdminAnswerDetailsResponse();
+
+                    Question q = answer.getQuestion();
+
+                    List<AdminOptionResponse> options = null;
+
+                    if (q.getType() == QuestionType.QCM) {
+
+                        options = q.getOptions()
+                                .stream()
+                                .map(o -> new AdminOptionResponse(
+                                        o.getId(),
+                                        o.getContent(),
+                                        o.isCorrect()
+                                ))
+                                .toList();
+
+                    }
+
+                    a.setQuestionId(q.getId());
+                    a.setQuestionContent(q.getContent());
+                    a.setQuestionType(q.getType().name());
+                    a.setQuestionPoints(q.getPoints());
+
+                    if (q.getType() == QuestionType.QCM) {
+
+                        a.setStudentAnswer(
+                                answer.getSelectedOption() != null
+                                        ? answer.getSelectedOption().getContent()
+                                        : null
+                        );
+
+                        String correct = q.getOptions()
+                                .stream()
+                                .filter(Option::isCorrect)
+                                .findFirst()
+                                .map(Option::getContent)
+                                .orElse(null);
+
+                        a.setCorrectAnswer(correct);
+                    }
+
+                    if (q.getType() == QuestionType.TEXT) {
+
+                        a.setStudentAnswer(answer.getTextAnswer());
+                        a.setCorrectAnswer(q.getExpectedAnswer());
+                    }
+
+                    a.setAwardedPoints(answer.getAwardedPoints());
+                    a.setOptions(options);
+
+                    return a;
+                })
+                .toList();
+
+        dto.setAnswers(answers);
+
+        return dto;
+    }
+
+
+    public AdminTestResultDetailsResponse getStudentResultDetails(
+            Long resultId,
+            User student) {
+
+        TestResult result = resultRepository.findById(resultId)
+                .orElseThrow(() -> new RuntimeException("Result not found"));
+
+        if (!result.getStudent().getId().equals(student.getId())) {
+            throw new RuntimeException("Access denied");
+        }
+
+        return getAdminResultDetails(resultId);
+    }
+
+    public List<AdminTestResultResponse> getTeacherStudentsResults(String email) {
+
+        User teacher = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Teacher not found"));
+
+        List<TestResult> results =
+                resultRepository.findByStudent_Teacher_Id(teacher.getId());
+
+        return results.stream().map(result -> {
+
+            AdminTestResultResponse dto = new AdminTestResultResponse();
+
+            dto.setResultId(result.getId());
+            dto.setStudentFirstName(result.getStudent().getFirstName());
+            dto.setStudentLastName(result.getStudent().getLastName());
+            dto.setScore(result.getScore());
+            dto.setMaxScore(result.getMaxScore());
+            dto.setCompletedAt(result.getCompletedAt());
+
+            return dto;
+
+        }).toList();
+    }
+
+
+    public AdminTestResultDetailsResponse getTeacherResultDetails(
+            Long resultId,
+            String teacherEmail
+    ) {
+
+        TestResult result = resultRepository.findById(resultId)
+                .orElseThrow(() -> new RuntimeException("Result not found"));
+
+        User teacher = userRepository.findByEmail(teacherEmail)
+                .orElseThrow(() -> new RuntimeException("Teacher not found"));
+
+        if (!result.getStudent().getTeacher().getId().equals(teacher.getId())) {
+            throw new RuntimeException("Access denied");
+        }
+
+        return getAdminResultDetails(resultId);
+    }
+
 }

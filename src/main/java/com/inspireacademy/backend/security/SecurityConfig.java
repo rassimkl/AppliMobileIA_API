@@ -41,6 +41,11 @@ public class SecurityConfig {
                         // Routes publiques
                         .requestMatchers("/api/auth/**").permitAll()
 
+                        // paiement
+                        .requestMatchers("/api/payments/stripe/webhook").permitAll()
+
+                        .requestMatchers("/uploads/**").permitAll()
+
                         // Routes protégées
                         .requestMatchers("/api/**").authenticated()
 

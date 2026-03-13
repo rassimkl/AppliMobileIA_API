@@ -11,5 +11,7 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
 
     // Vérifier si un paiement existe déjà pour une réservation
     Optional<Payment> findByReservationId(Long reservationId);
+    boolean existsByStripeEventId(String stripeEventId);
+    Optional<Payment> findByPaymentIntentId(String paymentIntentId);
 
 }

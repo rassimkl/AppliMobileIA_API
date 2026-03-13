@@ -1,13 +1,16 @@
 package com.inspireacademy.backend.controller;
 
 import com.inspireacademy.backend.dto.CreateUserRequest;
+import com.inspireacademy.backend.dto.LangueSimpleResponse;
 import com.inspireacademy.backend.dto.UpdateUserRequest;
 import com.inspireacademy.backend.dto.UserResponse;
 import com.inspireacademy.backend.model.Role;
+import com.inspireacademy.backend.model.User;
 import com.inspireacademy.backend.service.UserService;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
@@ -82,4 +85,35 @@ public class UserController {
         userService.deleteUser(id);
         return ResponseEntity.noContent().build();
     }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("/assign")
+    public ResponseEntity<Void> assignStudentToTeacher(
+            @RequestParam Long studentId,
+            @RequestParam Long teacherId
+    ) {
+
+        userService.assignStudentToTeacher(studentId, teacherId);
+
+        return ResponseEntity.ok().build();
+    }
+
+    @PreAuthorize("hasRole('ENSEIGNANT')")
+    @GetMapping("/teachers/me/students")
+    public ResponseEntity<List<UserResponse>> getMyStudents(Authentication authentication) {
+
+        String email = authentication.getName();
+
+        return ResponseEntity.ok(
+                userService.getStudentsForTeacher(email)
+        );
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/me/languages")
+    public ResponseEntity<List<LangueSimpleResponse>> getMyLanguages(Authentication authentication) {
+        String email = authentication.getName();
+        return ResponseEntity.ok(userService.getCurrentUserLanguages(email));
+    }
+
 }

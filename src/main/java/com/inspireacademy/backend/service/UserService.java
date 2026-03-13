@@ -1,6 +1,7 @@
 package com.inspireacademy.backend.service;
 
 import com.inspireacademy.backend.dto.CreateUserRequest;
+import com.inspireacademy.backend.dto.LangueSimpleResponse;
 import com.inspireacademy.backend.dto.UserResponse;
 import com.inspireacademy.backend.dto.UpdateUserRequest;
 import com.inspireacademy.backend.model.Langue;
@@ -113,6 +114,38 @@ public class UserService {
         userRepository.deleteById(id);
     }
 
+    public void assignStudentToTeacher(Long studentId, Long teacherId) {
+
+        User student = userRepository.findById(studentId)
+                .orElseThrow(() -> new RuntimeException("Étudiant introuvable"));
+
+        User teacher = userRepository.findById(teacherId)
+                .orElseThrow(() -> new RuntimeException("Enseignant introuvable"));
+
+        if (student.getRole() != Role.ETUDIANT) {
+            throw new RuntimeException("L'utilisateur n'est pas un étudiant");
+        }
+
+        if (teacher.getRole() != Role.ENSEIGNANT) {
+            throw new RuntimeException("L'utilisateur n'est pas un enseignant");
+        }
+
+        student.setTeacher(teacher);
+
+        userRepository.save(student);
+    }
+
+    public List<UserResponse> getStudentsForTeacher(String email) {
+
+        User teacher = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Teacher not found"));
+
+        return teacher.getStudents()
+                .stream()
+                .map(this::mapToResponse)
+                .toList();
+    }
+
     private UserResponse mapToResponse(User user) {
 
         Set<String> languageNames = user.getLanguages()
@@ -132,4 +165,12 @@ public class UserService {
         );
     }
 
+    public List<LangueSimpleResponse> getCurrentUserLanguages(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        return user.getLanguages().stream()
+                .map(langue -> new LangueSimpleResponse(langue.getId(), langue.getName()))
+                .toList();
+    }
 }
