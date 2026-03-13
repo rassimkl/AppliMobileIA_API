@@ -1,6 +1,7 @@
 package com.inspireacademy.backend.controller;
 
 import com.inspireacademy.backend.dto.CreateUserRequest;
+import com.inspireacademy.backend.dto.LangueSimpleResponse;
 import com.inspireacademy.backend.dto.UpdateUserRequest;
 import com.inspireacademy.backend.dto.UserResponse;
 import com.inspireacademy.backend.model.Role;
@@ -107,4 +108,12 @@ public class UserController {
                 userService.getStudentsForTeacher(email)
         );
     }
+
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/me/languages")
+    public ResponseEntity<List<LangueSimpleResponse>> getMyLanguages(Authentication authentication) {
+        String email = authentication.getName();
+        return ResponseEntity.ok(userService.getCurrentUserLanguages(email));
+    }
+
 }

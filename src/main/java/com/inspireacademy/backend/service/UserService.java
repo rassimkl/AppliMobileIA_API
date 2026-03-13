@@ -1,6 +1,7 @@
 package com.inspireacademy.backend.service;
 
 import com.inspireacademy.backend.dto.CreateUserRequest;
+import com.inspireacademy.backend.dto.LangueSimpleResponse;
 import com.inspireacademy.backend.dto.UserResponse;
 import com.inspireacademy.backend.dto.UpdateUserRequest;
 import com.inspireacademy.backend.model.Langue;
@@ -164,4 +165,12 @@ public class UserService {
         );
     }
 
+    public List<LangueSimpleResponse> getCurrentUserLanguages(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        return user.getLanguages().stream()
+                .map(langue -> new LangueSimpleResponse(langue.getId(), langue.getName()))
+                .toList();
+    }
 }
